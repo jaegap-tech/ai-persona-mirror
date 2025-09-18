@@ -1,14 +1,17 @@
-<script>
+<script lang="ts">
     import Welcome from './Welcome.svelte';
     import Question from './Question.svelte';
     import Result from './Result.svelte';
 
-    // Pre-existing state variables
-    let quizState = $state('not_started'); // 'not_started', 'in_progress', 'completed'
+    type QuizQuestion = {
+        text: string;
+        options: string[];
+    };
+
+    let quizState = $state<'not_started' | 'in_progress' | 'completed'>('not_started');
     let finalResult = $state('');
 
-    // 1. Quiz Data Structure
-    const questions = [
+    const questions: QuizQuestion[] = [
         {
             text: '새로운 프로젝트를 시작할 때 가장 먼저 하는 일은?',
             options: ['상세한 계획 세우기', '바로 프로토타입 만들기', '팀원들과 브레인스토밍', '관련 기술 리서치']
@@ -31,31 +34,24 @@
         }
     ];
 
-    // 2. State Management
     let currentQuestionIndex = $state(0);
-    let userAnswers = $state([]);
+    let userAnswers = $state<string[]>([]);
 
-    // 3. Core Logic Function
-    function handleAnswer(selectedOption) {
-        // Immutable update
+    function handleAnswer(selectedOption: string) {
         userAnswers = [...userAnswers, selectedOption];
 
         if (currentQuestionIndex < questions.length - 1) {
-            // If it is NOT the last question
             currentQuestionIndex++;
         } else {
-            // If it IS the last question
             quizState = 'completed';
-            finalResult = "결과를 분석 중입니다... 잠시만 기다려주세요.";
-            
-            // Simulate API call for result generation
+            finalResult = '결과를 분석 중입니다... 잠시만 기다려주세요.';
+
             setTimeout(() => {
                 finalResult = `당신은 ${userAnswers.slice(0, 2).join(', ')} 등의 특징을 가진, 분석적이고 창의적인 해결사 타입입니다!`;
             }, 2000);
         }
     }
 
-    // For completeness
     function startQuiz() {
         quizState = 'in_progress';
     }
@@ -69,45 +65,18 @@
 </script>
 
 <!-- 4. Component Integration and Markup -->
-<div class="quiz-container">
-    {#if quizState === 'not_started'}
-        <Welcome onStart={startQuiz} />
-    {:else if quizState === 'in_progress'}
-        <Question 
-            question={questions[currentQuestionIndex]} 
-            onAnswer={handleAnswer} 
-        />
-    {:else if quizState === 'completed'}
-        <Result 
-            resultText={finalResult} 
-            onRestart={restartQuiz} 
-        />
-    {/if}
+<div class="w-full max-w-2xl mx-auto rounded-2xl bg-white p-8 text-center shadow-xl ring-1 ring-slate-100/80 animate-fade-in md:p-10">
+  {#if quizState === 'not_started'}
+    <Welcome onStart={startQuiz} />
+  {:else if quizState === 'in_progress'}
+    <Question
+      question={questions[currentQuestionIndex]}
+      onAnswer={handleAnswer}
+    />
+  {:else if quizState === 'completed'}
+    <Result
+      resultText={finalResult}
+      onRestart={restartQuiz}
+    />
+  {/if}
 </div>
-
-<style>
-    .quiz-container {
-        max-width: 600px;
-        margin: 2rem auto;
-        padding: 2rem;
-        text-align: center;
-        border: 1px solid #eee;
-        border-radius: 8px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-
-    :global(button) {
-        margin: 0.5rem;
-        padding: 0.8rem 1.5rem;
-        border: 1px solid #ccc;
-        background-color: #f9f9f9;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 1rem;
-        transition: background-color 0.2s;
-    }
-
-    :global(button:hover) {
-        background-color: #e9e9e9;
-    }
-</style>
