@@ -1,17 +1,56 @@
-<script>
-    let { resultText, onRestart } = $props();
+<script lang="ts">
+    import { onMount } from 'svelte';
+    import { marked } from 'marked';
+
+    const { answers = [], onRestart } = $props<{
+        answers?: { questionId: number; value: string }[];
+        onRestart: () => void;
+    }>();
+
+    let loading = $state(true);
+    let error = $state('');
+    let personaMd = $state('');
+
+    onMount(async () => {
+        if (!answers.length) {
+            error = '응답이 비어있어요.';
+            loading = false;
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/generate-persona', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ answers })
+            });
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data?.error || 'unknown error');
+            }
+
+            personaMd = data.persona ?? '';
+        } catch (caughtError: unknown) {
+            error = caughtError instanceof Error ? caughtError.message : '요청 중 오류가 발생했어요.';
+        } finally {
+            loading = false;
+        }
+    });
 </script>
 
-<section class="flex flex-col items-center gap-6 text-center">
-  <h3 class="text-xl font-medium text-slate-500">당신의 페르소나는...</h3>
-  {#if resultText && !resultText.includes('분석 중')}
-    <p class="result-gradient w-full max-w-xl rounded-2xl bg-blue-50 p-6 text-3xl font-bold text-blue-700 shadow-inner">
-      {resultText}
-    </p>
+<div class="max-w-2xl mx-auto flex flex-col gap-6 p-6">
+  {#if loading}
+    <div class="space-y-3">
+      <div class="h-6 animate-pulse rounded bg-gray-200"></div>
+      <div class="h-6 w-2/3 animate-pulse rounded bg-gray-200"></div>
+      <div class="h-4 animate-pulse rounded bg-gray-100"></div>
+      <div class="h-4 w-1/2 animate-pulse rounded bg-gray-100"></div>
+    </div>
+  {:else if error}
+    <p class="text-red-600">⚠️ {error}</p>
   {:else}
-    <p class="text-lg text-slate-500 animate-pulse">
-      {resultText || '결과를 생성 중입니다...'}
-    </p>
+    <article class="prose max-w-none">{@html marked.parse(personaMd)}</article>
   {/if}
   <button
     class="inline-flex items-center justify-center rounded-lg border-2 border-slate-400 px-6 py-3 text-base font-semibold text-slate-600 transition duration-200 hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-slate-300"
@@ -19,4 +58,4 @@
   >
     다시 테스트하기
   </button>
-</section>
+</div>

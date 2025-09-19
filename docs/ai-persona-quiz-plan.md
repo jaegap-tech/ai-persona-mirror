@@ -358,8 +358,8 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import { GEMINI_API_KEY } from '$env/static/private';
 
 const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
-// 사용 모델: 최신 안정 모델로 교체 가능 (예: 'gemini-1.5-pro')
-const MODEL = 'gemini-1.5-pro';
+// 사용 모델: 최신 안정 모델로 교체 가능 (예: 'gemini-2.5-pro')
+const MODEL = 'gemini-2.5-pro';
 
 export const POST = async ({ request }) => {
   try {
@@ -463,7 +463,7 @@ export async function retry<T>(fn: () => Promise<T>, times = 2, backoffMs = 500)
 
 * 서버 라우트에서 결과를 저장하는 POSTGRES 삽입 로직 추가 (SDK 또는 REST)
 
-### Day 20 — 에2에(End-to-End) 시나리오
+### Day 20 — E2E(End-to-End) 시나리오
 
 * [ ] Welcome → 질문 → 결과(로딩) → AI 결과 마크다운 표시까지 **실제 배포 URL**에서 확인
 * [ ] 느린 네트워크/모바일에서도 UX 괜찮은지 확인
