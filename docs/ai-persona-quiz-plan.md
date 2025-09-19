@@ -1,4 +1,4 @@
-# 🧭 AI 페르소나 퀴즈 — 주니어 개발자를 위한 “초세분화” 실행 계획
+# 🧭 AI 페르소나 미러 — 주니어 개발자를 위한 “초세분화” 실행 계획
 
 아래 체크리스트는 **그대로 따라 하면 동작**하도록 명령어·파일 생성·코드 예시·검증 포인트까지 포함했습니다.
 (윈도우/맥 공통. `>` 표시는 터미널/PowerShell에서 입력)
@@ -27,11 +27,11 @@
 1. 프로젝트 생성
 
 ```bash
-> npm create svelte@latest ai-persona-quiz
+> npm create svelte@latest ai-persona-mirror
 # 템플릿: Skeleton project
 # TypeScript: Yes, using TypeScript
 # ESLint/Prettier: 스페이스바로 선택
-> cd ai-persona-quiz
+> cd ai-persona-mirror
 > npm install
 ```
 
@@ -102,11 +102,11 @@ node_modules
 
 ```bash
 > git branch -M main
-> git remote add origin https://github.com/<YOUR_GITHUB_USERNAME>/ai-persona-quiz.git
+> git remote add origin https://github.com/<YOUR_GITHUB_USERNAME>/ai-persona-mirror.git
 > git push -u origin main
 ```
 
-2. Vercel에서 `New Project` → GitHub의 `ai-persona-quiz` Import → **Deploy**
+2. Vercel에서 `New Project` → GitHub의 `ai-persona-mirror` Import → **Deploy**
 
 * 완료 후 `https://<project>.vercel.app` 접속 확인
 
@@ -122,7 +122,7 @@ node_modules
 </script>
 
 <section class="min-h-[60vh] flex flex-col items-center justify-center gap-6">
-  <h1 class="text-3xl font-bold">AI 페르소나 퀴즈</h1>
+  <h1 class="text-3xl font-bold">AI 페르소나 미러</h1>
   <p class="text-gray-600">버튼을 눌러 시작하세요!</p>
   <button class="btn btn-primary px-6 py-3 rounded-xl shadow"
           on:click={start}>시작하기</button>
@@ -506,9 +506,9 @@ export async function retry<T>(fn: () => Promise<T>, times = 2, backoffMs = 500)
 
 ```svelte
 <svelte:head>
-  <title>AI 페르소나 퀴즈 | 주니어 개발자 맞춤 분석</title>
-  <meta name="description" content="주니어 개발자를 위한 AI 맞춤 페르소나 분석 퀴즈" />
-  <meta property="og:title" content="AI 페르소나 퀴즈" />
+  <title>AI 페르소나 미러 | 주니어 개발자 맞춤 분석</title>
+  <meta name="description" content="주니어 개발자를 위한 AI 맞춤 페르소나 분석 미러" />
+  <meta property="og:title" content="AI 페르소나 미러" />
   <meta property="og:description" content="내 개발 성향을 AI가 재미있게 분석!" />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://YOUR_DOMAIN" />
@@ -658,7 +658,7 @@ Sitemap: https://YOUR_DOMAIN/sitemap.xml
 
 ### ✅ 최종 목표 체크리스트
 
-* [ ] 배포 URL에서 **퀴즈 → AI 결과**가 문제없이 표시된다.
+* [ ] 배포 URL에서 **미러 → AI 결과**가 문제없이 표시된다.
 * [ ] 최소 1개 커뮤니티에 프로젝트를 소개했다.
 * [ ] (승인 후) 광고/후원 버튼이 실제로 보이고 클릭된다.
 * [ ] 첫 사용자 피드백을 3건 이상 수집했다.
