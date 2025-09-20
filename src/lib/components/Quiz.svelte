@@ -2,37 +2,31 @@
     import Welcome from './Welcome.svelte';
     import Question from './Question.svelte';
     import Result from './Result.svelte';
+    import { supabase } from '$lib/supabaseClient.js';
+
+    type QuizAxis = 'EI' | 'SN' | 'TF' | 'JP';
 
     type QuizQuestion = {
         id: number;
         text: string;
         options: string[];
+        axis: QuizAxis;
     };
 
-    let quizState = $state<'not_started' | 'in_progress' | 'completed'>('not_started');
+    type QuizState = 'not_started' | 'loading' | 'in_progress' | 'completed';
+
+    let quizState = $state<QuizState>('not_started');
     let currentQuestionIndex = $state(0);
     let userAnswers = $state<{ questionId: number; value: string }[]>([]);
-
-    const questions: QuizQuestion[] = [
-        {
-            id: 1,
-            text: '새로운 하루를 시작할 때 가장 먼저 떠오르는 생각은?',
-            options: ['오늘의 계획을 꼼꼼히 정리해야지', '오늘은 어떤 재미가 기다릴까?', '사람들과 나눌 이야기가 궁금해', '조용히 나만의 시간을 즐겨야지']
-        },
-        {
-            id: 2,
-            text: '친한 친구가 고민을 털어놓는다면, 당신은 어떻게 반응하나요?',
-            options: ['바로 해결책을 찾아보고 돕는다', '끝까지 들어주고 공감해준다', '자료를 찾아 함께 분석한다', '기분 전환이 될 활동을 제안한다']
-        },
-        {
-            id: 3,
-            text: '당신이 가장 몰입하는 순간은 언제인가요?',
-            options: ['새로운 아이디어를 떠올릴 때', '사람들과 함께 웃고 떠들 때', '차분히 배우고 정리할 때', '몸을 움직이며 활동할 때']
-        }
-    ];
+    let questions = $state<QuizQuestion[]>([]);
 
     function handleAnswer(selectedOption: string) {
         const currentQuestion = questions[currentQuestionIndex];
+
+        if (!currentQuestion) {
+            return;
+        }
+
         userAnswers = [...userAnswers, { questionId: currentQuestion.id, value: selectedOption }];
 
         if (currentQuestionIndex < questions.length - 1) {
@@ -42,25 +36,59 @@
         }
     }
 
-    function startQuiz() {
-        quizState = 'in_progress';
+    async function startQuiz() {
+        quizState = 'loading';
+        currentQuestionIndex = 0;
+        userAnswers = [];
+        questions = [];
+
+        try {
+            const { data, error } = await supabase.rpc('get_random_quiz_questions');
+
+            if (error) {
+                throw error;
+            }
+
+            if (!Array.isArray(data) || data.length === 0) {
+                throw new Error('No questions returned from Supabase.');
+            }
+
+            questions = data.map((question: Record<string, unknown>) => ({
+                id: Number(question.id),
+                text: String(question.text ?? ''),
+                options: Array.isArray(question.options) ? (question.options as string[]) : [],
+                axis: question.axis as QuizAxis
+            }));
+
+            quizState = 'in_progress';
+        } catch (loadError) {
+            console.error('Failed to load quiz questions', loadError);
+            quizState = 'not_started';
+        }
     }
 
     function restartQuiz() {
         quizState = 'not_started';
         currentQuestionIndex = 0;
         userAnswers = [];
+        questions = [];
     }
 </script>
 
 <div class="mx-auto w-full max-w-2xl rounded-2xl bg-white p-8 text-center shadow-xl ring-1 ring-slate-100/80 animate-fade-in md:p-10">
   {#if quizState === 'not_started'}
     <Welcome onStart={startQuiz} />
+  {:else if quizState === 'loading'}
+    <div class="py-16 text-base font-medium text-slate-600">새로운 질문을 불러오는 중...</div>
   {:else if quizState === 'in_progress'}
-    <Question
-      question={questions[currentQuestionIndex]}
-      onAnswer={handleAnswer}
-    />
+    {#if questions.length}
+      <Question
+        question={questions[currentQuestionIndex]}
+        onAnswer={handleAnswer}
+      />
+    {:else}
+      <div class="py-16 text-base text-slate-600">질문을 불러오지 못했어요. 잠시 후 다시 시도해주세요.</div>
+    {/if}
   {:else if quizState === 'completed'}
     <Result
       answers={userAnswers}
