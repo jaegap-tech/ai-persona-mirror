@@ -10,6 +10,12 @@
     let loading = $state(true);
     let error = $state('');
     let personaMd = $state('');
+    let characterLine = $state('');
+    let movieTitle = $state('');
+    let characterName = $state('');
+    let personaBody = $state('');
+    let personaHtml = $state('');
+    let hashtags = $state<string[]>([]);
 
     onMount(async () => {
         if (!answers.length) {
@@ -37,6 +43,48 @@
             loading = false;
         }
     });
+
+    $effect(() => {
+        if (!personaMd) {
+            characterLine = '';
+            movieTitle = '';
+            characterName = '';
+            personaBody = '';
+            personaHtml = '';
+            hashtags = [];
+            return;
+        }
+
+        const lines = personaMd
+            .split(/\r?\n/)
+            .map((line) => line.trim())
+            .filter((line) => line.length > 0);
+
+        const [firstLineRaw, ...rest] = lines;
+        const firstLine = (firstLineRaw ?? '').replace(/^[#*\s]+/, '');
+        characterLine = firstLine;
+
+        const nameMatch = firstLine.match(/^\[(.+?)\]\s*의\s*(.+)$/);
+        movieTitle = nameMatch?.[1] ?? '';
+        characterName = nameMatch?.[2] ?? firstLine.replace(/^\[(.+?)\]\s*의\s*/, '');
+
+        const hashtagIndex = rest.findIndex((line) => line.startsWith('#'));
+        if (hashtagIndex !== -1) {
+            hashtags = rest[hashtagIndex]
+                .split(/\s+/)
+                .filter((token) => token.startsWith('#'))
+                .slice(0, 3);
+            rest.splice(hashtagIndex, 1);
+        } else {
+            hashtags = [];
+        }
+
+        personaBody = rest.join('\n\n');
+        const parsed = personaBody ? marked.parse(personaBody) : '';
+        personaHtml = typeof parsed === 'string' ? parsed : '';
+
+    });
+
 </script>
 
 <div class="max-w-2xl mx-auto flex flex-col gap-6 p-6">
@@ -54,10 +102,30 @@
   {:else if error}
     <p class="text-red-600">⚠️ {error}</p>
   {:else}
-    <div class="space-y-4 text-left">
-      <h2 class="text-2xl font-semibold text-slate-800">당신과 닮은 영화 속 친구</h2>
-      <p class="text-base text-slate-600">AI 분석으로 찾은 닮은꼴 캐릭터를 확인해보세요.</p>
-      <article class="prose max-w-none">{@html marked.parse(personaMd)}</article>
+    <div class="space-y-6 text-left">
+      <div class="rounded-2xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-700 p-8 text-white shadow-lg">
+        <span class="text-sm font-semibold uppercase tracking-[0.2em] text-slate-300">분석 결과</span>
+        <h1 class="mt-2 text-3xl font-bold leading-tight">{characterName || characterLine || '영화 속 친구'}</h1>
+        {#if movieTitle}
+          <p class="mt-2 text-sm text-slate-200">영화: {movieTitle}</p>
+        {/if}
+      </div>
+
+      {#if personaHtml}
+        <section class="space-y-4">
+          <h2 class="text-lg font-semibold text-slate-800">장면 속 당신</h2>
+          <article class="prose max-w-none text-slate-700">{@html personaHtml}</article>
+        </section>
+      {/if}
+
+      {#if hashtags.length}
+        <div class="flex flex-wrap gap-2">
+          {#each hashtags as tag}
+            <span class="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-sm font-medium text-blue-700">{tag}</span>
+          {/each}
+        </div>
+      {/if}
+
     </div>
   {/if}
   <button
