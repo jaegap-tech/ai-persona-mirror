@@ -50,7 +50,11 @@
   {:else if error}
     <p class="text-red-600">⚠️ {error}</p>
   {:else}
-    <article class="prose max-w-none">{@html marked.parse(personaMd)}</article>
+    <div class="space-y-4 text-left">
+      <h2 class="text-2xl font-semibold text-slate-800">당신과 닮은 영화 속 친구</h2>
+      <p class="text-base text-slate-600">AI 분석으로 찾은 닮은꼴 캐릭터를 확인해보세요.</p>
+      <article class="prose max-w-none">{@html marked.parse(personaMd)}</article>
+    </div>
   {/if}
   <button
     class="inline-flex items-center justify-center rounded-lg border-2 border-slate-400 px-6 py-3 text-base font-semibold text-slate-600 transition duration-200 hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-slate-300"

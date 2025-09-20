@@ -370,14 +370,19 @@ export const POST = async ({ request }) => {
     }
 
     const prompt = [
-      '당신은 심리 및 성격 분석 전문가입니다.',
-      '다음은 사용자의 퀴즈 응답 목록입니다.',
-      '응답을 종합적으로 분석하여 다음을 포함한 마크다운 보고서를 작성하세요:',
-      '- 핵심 페르소나 요약(2~3문장)',
-      '- 성향(예: 내향/외향, 학습 스타일) 불릿',
-      '- 개발자 관점의 강점/리스크',
-      '- 커리어 추천(주니어 개발자 관점, 3가지)',
-      '- 비유 1문장(친근하고 재치있게)',
+      '당신은 영화와 심리 분석에 능숙한 전문 큐레이터입니다.',
+      '사용자의 답변을 바탕으로 이 사람이 주인공인 영화의 한 장면을 상상하고, 그 장면의 나레이션처럼 결과를 전합니다.',
+      '이 사람의 페르소나를 가장 잘 드러내는 실제 영화 속 캐릭터 한 명을 선정하고, 한국어 마크다운으로 500자 이내의 카피라이팅 스타일 답변을 작성하며 아래 지침을 정확히 따릅니다.',
+      '',
+      '# 🎬 당신과 닮은 영화 캐릭터: <캐릭터 이름>(<영화 제목>)',
+      '',
+      '본문 구성:',
+      '- 첫 문단: 따뜻한 두 문장으로 요약하며 사용자 응답을 최소 1회 직접 언급',
+      '- 두 번째 문단: 캐릭터를 선택한 이유를 이야기하듯 2문장으로 설명하고 추가로 응답을 1회 이상 언급',
+      '- 세 번째 문단: 기억에 남는 장면이나 대사를 *이탤릭*으로 소개하고 이어서 일상에서 참고할 만한 제안을 한 문장으로 자연스럽게 연결',
+      '- 마지막 문장: 재치 있는 비유로 마무리',
+      '',
+      '규칙: 불릿이나 번호를 본문에 사용하지 말고, 문단 사이에는 빈 줄 하나만 두며, 전체 글자 수는 500자를 넘기지 않고 존댓말과 응원하는 톤을 유지하세요.',
       '',
       `응답: ${JSON.stringify(answers)}`
     ].join('\n');
@@ -506,10 +511,10 @@ export async function retry<T>(fn: () => Promise<T>, times = 2, backoffMs = 500)
 
 ```svelte
 <svelte:head>
-  <title>AI 페르소나 미러 | 주니어 개발자 맞춤 분석</title>
-  <meta name="description" content="주니어 개발자를 위한 AI 맞춤 페르소나 분석 미러" />
-  <meta property="og:title" content="AI 페르소나 미러" />
-  <meta property="og:description" content="내 개발 성향을 AI가 재미있게 분석!" />
+  <title>영화 캐릭터 미러 | 나와 닮은 페르소나 분석</title>
+  <meta name="description" content="취향과 성향을 닮은 영화 캐릭터를 찾아주는 AI 페르소나 미러" />
+  <meta property="og:title" content="영화 캐릭터 미러" />
+  <meta property="og:description" content="AI가 당신과 어울리는 영화 속 친구를 소개해드려요!" />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://YOUR_DOMAIN" />
   <meta property="og:image" content="https://YOUR_DOMAIN/og-image.png" />
