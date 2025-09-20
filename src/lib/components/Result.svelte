@@ -41,11 +41,15 @@
 
 <div class="max-w-2xl mx-auto flex flex-col gap-6 p-6">
   {#if loading}
-    <div class="space-y-3">
-      <div class="h-6 animate-pulse rounded bg-gray-200"></div>
-      <div class="h-6 w-2/3 animate-pulse rounded bg-gray-200"></div>
-      <div class="h-4 animate-pulse rounded bg-gray-100"></div>
-      <div class="h-4 w-1/2 animate-pulse rounded bg-gray-100"></div>
+    <div class="flex flex-col items-center gap-6 text-slate-500">
+      <div class="flex h-14 w-14 items-center justify-center rounded-full border-4 border-blue-200 border-t-transparent animate-spin"></div>
+      <p class="text-base font-medium">영화 속 친구를 찾는 중이에요...</p>
+      <div class="w-full space-y-3">
+        <div class="h-6 animate-pulse rounded bg-gray-200"></div>
+        <div class="h-6 w-2/3 animate-pulse rounded bg-gray-200"></div>
+        <div class="h-4 animate-pulse rounded bg-gray-100"></div>
+        <div class="h-4 w-1/2 animate-pulse rounded bg-gray-100"></div>
+      </div>
     </div>
   {:else if error}
     <p class="text-red-600">⚠️ {error}</p>
